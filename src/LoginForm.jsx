@@ -8,65 +8,59 @@ import { login } from "./api";
 //
 //
 // Tasks:
-// * +The "Login" button should trigger the "login()" action imported above and should pass the required data
-// * +Disable the "Login" button if email is blank OR if password is less than 6 letters
-// * +Disable the "Login" button while "login()" action is being performed
-// * +Show an error message from the "login()" action is being performed. The error message should be cleared every time user re-attempts to login
-// * +Show an alert box (native Javascript alert) if login succeeds. CHECK THE "login()" FUNCTION TO FIND OUT HOW TO LOGIN SUCCESSFULLY.
+// * The "Login" button should trigger the "login()" action imported above and should pass the required data
+// * Disable the "Login" button if email is blank OR if password is less than 6 letters
+// * Disable the "Login" button while "login()" action is being performed
+// * Show an error message from the "login()" action is being performed. The error message should be cleared every time user re-attempts to login
+// * Show an alert box (native Javascript alert) if login succeeds. CHECK THE "login()" FUNCTION TO FIND OUT HOW TO LOGIN SUCCESSFULLY.
 
 const LoginForm = () => {
-  const [formValue, setFormValue] = useState({
-    email: "test@gmail.com",
-    password: "password",
-  });
+  let [email, setEmail] = useState("");
+  let [password, setPassword] = useState("");
+  let [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const onSubmit = async (e) => {
+  const handleLogin = async () => {
+    if (!email.length || password.length < 6) return;
+    setIsLoading(true);
+    setError("");
     try {
-      e.preventDefault();
-      setIsLoading(true);
-      await login(formValue.email, formValue.password);
+      const response = await login(email, password);
+      console.log("Login successful:", response);
+    } catch (error) {
+      setError(error.message || "Login failed");
+    } finally {
       setIsLoading(false);
-      alert("Success");
-      setError("");
-    } catch (e) {
-      setIsLoading(false);
-      console.log(e);
-      setError(e);
     }
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form>
       <div>
         <label>Email:</label>
         <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           type="email"
-          onChange={(e) =>
-            setFormValue((prev) => ({ ...prev, email: e.target.value }))
-          }
-          value={formValue.email}
           required
         />
       </div>
       <div>
         <label>Password:</label>
         <input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           type="password"
           required
-          onChange={(e) =>
-            setFormValue((prev) => ({ ...prev, password: e.target.value }))
-          }
-          value={formValue.password}
         />
       </div>
-      {/* +Display form error messages inside the "div". Show "div" ONLY if there are login error */}
+      {/* Display form error messages inside the "div". Show "div" ONLY if there are login error */}
       {error && (
         <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>
       )}
       <button
-        disabled={!formValue.email || !formValue.password || isLoading}
+        disabled={isLoading || !email.length || password.length < 6}
+        onClick={handleLogin}
         type="submit"
       >
         Login
