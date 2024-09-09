@@ -1,13 +1,23 @@
 import { useCallback, useState } from "react";
 import { login } from "../api";
 
+const initialState = {
+  email: "",
+  password: "",
+};
+
 export const useLogin = () => {
-  const [{ email, password }, setState] = useState({ email: "", password: "" });
+  const [{ email, password }, setState] = useState(initialState);
   const [error, setError] = useState("");
 
   const onChange = useCallback((event) => {
     const { name, value } = event.target;
     setState((prevState) => ({ ...prevState, [name]: value }));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setState(initialState);
+    setError("");
   }, []);
 
   const onLogin = useCallback(
@@ -24,15 +34,14 @@ export const useLogin = () => {
       }
       try {
         await login(email, password);
-        setError("");
-        setState({ password: "", email: "" });
+        clearAll();
         alert("SUCCESSFULLY");
       } catch (err) {
         setError(err);
         console.log("[Error-onLogin]:", err);
       }
     },
-    [email, password]
+    [clearAll, email, password]
   );
 
   return {
