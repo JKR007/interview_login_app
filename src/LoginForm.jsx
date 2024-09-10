@@ -1,5 +1,4 @@
 import React from "react";
-import { login } from "./api";
 import { useLogin } from "./hooks/useLogin";
 
 // ======================== LOGIN FORM ======================
@@ -16,7 +15,7 @@ import { useLogin } from "./hooks/useLogin";
 // * Show an alert box (native Javascript alert) if login succeeds. CHECK THE "login()" FUNCTION TO FIND OUT HOW TO LOGIN SUCCESSFULLY.
 
 const LoginForm = () => {
-  const { onChange, email, password, onLogin, error } = useLogin();
+  const { actions, values } = useLogin();
   return (
     <form>
       <div>
@@ -24,9 +23,9 @@ const LoginForm = () => {
         <input
           type="email"
           name="email"
-          value={email}
+          value={values.email}
           required
-          onChange={onChange}
+          onChange={actions.onChange}
         />
       </div>
       <div>
@@ -34,17 +33,17 @@ const LoginForm = () => {
         <input
           type="password"
           name="password"
-          value={password}
-          onChange={onChange}
+          value={values.password}
+          onChange={actions.onChange}
           required
         />
       </div>
       {/* Display form error messages inside the "div". Show "div" ONLY if there are login error */}
-      {!!error && (
-        <div style={{ color: "red", marginBottom: "16px" }}>{error}</div>
+      {!!values.error && (
+        <div style={{ color: "red", marginBottom: "16px" }}>{values.error}</div>
       )}
-      <button type="submit" onClick={onLogin}>
-        Login
+      <button type="submit" onClick={actions.onLogin} disabled={values.loading}>
+        {values.loading ? "Loading..." : "Login"}
       </button>
     </form>
   );
