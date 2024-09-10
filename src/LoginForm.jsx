@@ -17,7 +17,7 @@ import { useLogin } from "./hooks/useLogin";
 const LoginForm = () => {
   const { actions, values } = useLogin();
   return (
-    <form>
+    <form onSubmit={actions.onLogin}>
       <div>
         <label>Email:</label>
         <input
@@ -42,7 +42,7 @@ const LoginForm = () => {
       {!!values.error && (
         <div style={{ color: "red", marginBottom: "16px" }}>{values.error}</div>
       )}
-      <button type="submit" onClick={actions.onLogin} disabled={values.loading}>
+      <button type="submit" disabled={values.loading}>
         {values.loading ? "Loading..." : "Login"}
       </button>
     </form>
