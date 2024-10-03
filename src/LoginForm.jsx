@@ -5,8 +5,6 @@ import { login } from "./api";
 //  * You have an incomplete login form
 //  * You are not allowed to add any additional HTML element
 //  * You are not allowed to use refs
-//
-//
 // Tasks:
 
 // * The "Login" button should trigger the "login()" action imported above and should pass the required data
@@ -18,15 +16,35 @@ import { login } from "./api";
 const LoginForm = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 	const [disabled, setDisabled] = useState(true);
 
-	const handleSubmit = () => {
+	const handleInput = (e, setState) => {
+		setState(e.target.value);
+		setError("");
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setLoading(true);
 		setDisabled(true);
-		setEmail();
+		try {
+			const data = await login(email, password);
+			setDisabled(false);
+			alert(data?.message);
+		} catch (error) {
+			setError(error);
+			setDisabled(true);
+		}
+		setEmail("");
+		setPassword("");
+		setLoading(false);
 	};
 
 	useEffect(() => {
-		if (email.length <= 0 || password.length < 6) {
+		setLoading(false);
+		if (!email || password.length < 6) {
 			setDisabled(true);
 		} else {
 			setDisabled(false);
@@ -40,7 +58,8 @@ const LoginForm = () => {
 				<input
 					type='email'
 					required
-					onChange={(e) => setEmail(e.currentTarget.value)}
+					autoComplete='new-password'
+					onChange={(e) => handleInput(e, setEmail)}
 				/>
 			</div>
 			<div>
@@ -48,13 +67,16 @@ const LoginForm = () => {
 				<input
 					type='password'
 					required
-					onChange={(e) => setPassword(e.currentTarget.value)}
+					autoComplete='off'
+					onChange={(e) => handleInput(e, setPassword)}
 				/>
 			</div>
 			{/* Display form error messages inside the "div". Show "div" ONLY if there are login error */}
-			<div style={{ color: "red", marginBottom: "16px" }}></div>
+			{!!error && (
+				<div style={{ color: "red", marginBottom: "16px" }}>{error}</div>
+			)}
 			<button type='submit' disabled={disabled}>
-				Login
+				{loading ? "Loading..." : "Login"}
 			</button>
 		</form>
 	);
